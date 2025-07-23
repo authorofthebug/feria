@@ -65,6 +65,12 @@ export default function Header() {
       showInfo('Inicia sesión', 'Debes iniciar sesión para cambiar entre modos de comprador y vendedor.');
       return;
     }
+    
+    if (currentUser.profileTypes.length <= 1) {
+      showInfo('Un solo tipo', 'Tu cuenta solo tiene un tipo de perfil configurado.');
+      return;
+    }
+    
     toggleProfileType();
   };
 
@@ -157,6 +163,9 @@ export default function Header() {
                     <span>Vendedor</span>
                   </>
                 )}
+                {currentUser && currentUser.profileTypes.length > 1 && (
+                  <span className="text-xs opacity-75">({currentUser.profileTypes.length} tipos)</span>
+                )}
               </motion.button>
 
               {/* Favorites */}
@@ -235,6 +244,12 @@ export default function Header() {
                         <div className="mt-2 text-sm text-gray-600">
                           <p>Favoritos: {userFavorites.length}</p>
                           <p>Mensajes: {userMessages.length}</p>
+                          <p className="mt-1">
+                            Tipos de perfil: {currentUser.profileTypes.join(' Y ')}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            Actual: {profileType === 'buyer' ? 'Comprador' : 'Vendedor'}
+                          </p>
                         </div>
                         <button
                           onClick={handleLogout}
@@ -304,6 +319,9 @@ export default function Header() {
                           <Store className="h-5 w-5" />
                           <span>Vendedor</span>
                         </>
+                      )}
+                      {currentUser && currentUser.profileTypes.length > 1 && (
+                        <span className="text-xs opacity-75">({currentUser.profileTypes.length})</span>
                       )}
                     </button>
 

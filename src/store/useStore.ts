@@ -38,6 +38,7 @@ interface AppState {
   // Actions
   setCurrentUser: (user: User | null) => void;
   toggleProfileType: () => void;
+  setProfileType: (type: 'seller' | 'buyer') => void;
   setProducts: (products: Product[]) => void;
   setSelectedProduct: (product: Product | null) => void;
   addToFavorites: (productId: string) => void;
@@ -77,11 +78,27 @@ export const useStore = create<AppState>((set, get) => ({
   notifications: [],
 
   // Actions
-  setCurrentUser: (user) => set({ currentUser: user }),
+  setCurrentUser: (user) => {
+    if (user && user.profileTypes.length > 0) {
+      set({ currentUser: user, profileType: user.profileTypes[0] });
+    } else {
+      set({ currentUser: user, profileType: 'buyer' });
+    }
+  },
   
-  toggleProfileType: () => set((state) => ({
-    profileType: state.profileType === 'buyer' ? 'seller' : 'buyer'
-  })),
+  toggleProfileType: () => set((state) => {
+    if (!state.currentUser || state.currentUser.profileTypes.length <= 1) {
+      return state;
+    }
+    
+    const currentIndex = state.currentUser.profileTypes.indexOf(state.profileType);
+    const nextIndex = (currentIndex + 1) % state.currentUser.profileTypes.length;
+    const nextProfileType = state.currentUser.profileTypes[nextIndex];
+    
+    return { profileType: nextProfileType };
+  }),
+  
+  setProfileType: (type) => set({ profileType: type }),
   
   setProducts: (products) => set({ products, filteredProducts: products }),
   

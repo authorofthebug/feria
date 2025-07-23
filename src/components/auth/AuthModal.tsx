@@ -25,11 +25,33 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     password: '',
     confirmPassword: '',
     name: '',
-    profileType: 'buyer' as 'buyer' | 'seller'
+    profileTypes: ['buyer'] as ('buyer' | 'seller')[]
   });
 
-  const handleInputChange = (field: string, value: string) => {
+  const handleInputChange = (field: string, value: string | ('buyer' | 'seller')[]) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleProfileTypeToggle = (type: 'buyer' | 'seller') => {
+    setFormData(prev => {
+      const currentTypes = [...prev.profileTypes];
+      const index = currentTypes.indexOf(type);
+      
+      if (index > -1) {
+        // Remove type if already selected
+        currentTypes.splice(index, 1);
+      } else {
+        // Add type if not selected
+        currentTypes.push(type);
+      }
+      
+      // Ensure at least one type is selected
+      if (currentTypes.length === 0) {
+        currentTypes.push('buyer');
+      }
+      
+      return { ...prev, profileTypes: currentTypes };
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -54,7 +76,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
               name: 'Usuario Demo',
               email: formData.email,
               avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
-              profileType: 'buyer' as const,
+              profileTypes: ['buyer'] as ('buyer' | 'seller')[],
               location: 'Madrid, España',
               rating: 4.5,
               joinDate: new Date().toISOString()
@@ -89,7 +111,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
             name: formData.name,
             email: formData.email,
             avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(formData.name)}&background=random`,
-            profileType: formData.profileType,
+            profileTypes: formData.profileTypes, // Assuming the first selected type is the primary
             location: 'Madrid, España',
             rating: 5.0,
             joinDate: new Date().toISOString()
@@ -123,7 +145,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
       password: '',
       confirmPassword: '',
       name: '',
-      profileType: 'buyer'
+      profileTypes: ['buyer']
     });
     setShowPassword(false);
     setShowConfirmPassword(false);
@@ -272,9 +294,9 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                       <div className="grid grid-cols-2 gap-3">
                         <button
                           type="button"
-                          onClick={() => handleInputChange('profileType', 'buyer')}
+                          onClick={() => handleProfileTypeToggle('buyer')}
                           className={`p-3 rounded-lg border-2 transition-colors ${
-                            formData.profileType === 'buyer'
+                            formData.profileTypes.includes('buyer')
                               ? 'border-blue-500 bg-blue-50 text-blue-700'
                               : 'border-gray-300 hover:border-gray-400'
                           }`}
@@ -286,9 +308,9 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                         </button>
                         <button
                           type="button"
-                          onClick={() => handleInputChange('profileType', 'seller')}
+                          onClick={() => handleProfileTypeToggle('seller')}
                           className={`p-3 rounded-lg border-2 transition-colors ${
-                            formData.profileType === 'seller'
+                            formData.profileTypes.includes('seller')
                               ? 'border-green-500 bg-green-50 text-green-700'
                               : 'border-gray-300 hover:border-gray-400'
                           }`}
@@ -299,6 +321,11 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                           </div>
                         </button>
                       </div>
+                      {formData.profileTypes.length > 1 && (
+                        <p className="text-xs text-gray-600 mt-2 text-center">
+                          Seleccionaste: {formData.profileTypes.join(' Y ')}
+                        </p>
+                      )}
                     </div>
                   )}
                 </>

@@ -3,7 +3,7 @@ export interface User {
   name: string;
   email: string;
   avatar: string;
-  profileType: 'seller' | 'buyer';
+  profileTypes: ('seller' | 'buyer')[];
   location: string;
   rating: number;
   joinDate: string;
@@ -56,7 +56,7 @@ export const mockUsers: User[] = [
     name: 'María González',
     email: 'maria@example.com',
     avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face',
-    profileType: 'seller',
+    profileTypes: ['seller'],
     location: 'Madrid, España',
     rating: 4.8,
     joinDate: '2023-01-15'
@@ -66,7 +66,7 @@ export const mockUsers: User[] = [
     name: 'Carlos Rodríguez',
     email: 'carlos@example.com',
     avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
-    profileType: 'buyer',
+    profileTypes: ['buyer'],
     location: 'Barcelona, España',
     rating: 4.5,
     joinDate: '2023-03-20'
@@ -76,7 +76,7 @@ export const mockUsers: User[] = [
     name: 'Ana Martínez',
     email: 'ana@example.com',
     avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face',
-    profileType: 'seller',
+    profileTypes: ['seller'],
     location: 'Valencia, España',
     rating: 4.9,
     joinDate: '2022-11-10'
