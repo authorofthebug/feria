@@ -29,7 +29,18 @@ const conditionColors = {
 };
 
 export default function ProductCard({ product, index }: ProductCardProps) {
-  const { currentUser, favorites, addToFavorites, removeFromFavorites, setSelectedProduct } = useStore();
+  const { 
+    currentUser, 
+    favorites, 
+    addToFavorites, 
+    removeFromFavorites, 
+    setSelectedProduct, 
+    addMessage,
+    showSuccess,
+    showError,
+    showInfo
+  } = useStore();
+  
   const [imageIndex, setImageIndex] = useState(0);
   const [isFavorite, setIsFavorite] = useState(
     favorites.some(fav => fav.productId === product.id && fav.userId === currentUser?.id)
@@ -39,14 +50,46 @@ export default function ProductCard({ product, index }: ProductCardProps) {
 
   const handleFavoriteToggle = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!currentUser) return;
+    if (!currentUser) {
+      showInfo('Inicia sesión', 'Debes iniciar sesión para agregar productos a tu lista de favoritos. ¡Es gratis y rápido!');
+      return;
+    }
     
     if (isFavorite) {
       removeFromFavorites(product.id);
+      showSuccess('Eliminado de favoritos', `${product.title} se ha eliminado de tu lista de favoritos.`);
     } else {
       addToFavorites(product.id);
+      showSuccess('Agregado a favoritos', `${product.title} se ha agregado a tu lista de favoritos. ¡Perfecto para revisarlo más tarde!`);
     }
     setIsFavorite(!isFavorite);
+  };
+
+  const handleContact = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!currentUser) {
+      showInfo('Inicia sesión', 'Debes iniciar sesión para contactar al vendedor. ¡Solo toma un momento!');
+      return;
+    }
+    
+    if (currentUser.id === product.sellerId) {
+      showError('No puedes contactarte contigo mismo', 'Este es tu propio producto. ¿Buscas algo diferente?');
+      return;
+    }
+
+    // Create a new message
+    const newMessage = {
+      id: Date.now().toString(),
+      senderId: currentUser.id,
+      receiverId: product.sellerId,
+      productId: product.id,
+      content: `Hola, me interesa tu producto "${product.title}". ¿Está disponible?`,
+      timestamp: new Date().toISOString(),
+      isRead: false
+    };
+
+    addMessage(newMessage);
+    showSuccess('Mensaje enviado', `Tu mensaje sobre "${product.title}" se ha enviado al vendedor. ¡Te responderán pronto!`);
   };
 
   const handleCardClick = () => {
@@ -170,10 +213,7 @@ export default function ProductCard({ product, index }: ProductCardProps) {
 
         {/* Action Button */}
         <motion.button
-          onClick={(e) => {
-            e.stopPropagation();
-            // Handle message action
-          }}
+          onClick={handleContact}
           className="w-full mt-3 flex items-center justify-center space-x-2 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}

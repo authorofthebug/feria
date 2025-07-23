@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { User, Product, Message, Favorite } from '@/data/mockData';
+import { NotificationType } from '@/components/ui/Notification';
 
 interface AppState {
   // User state
@@ -23,6 +24,17 @@ interface AppState {
   selectedCategory: string;
   priceRange: [number, number];
   
+  // Auth state
+  isAuthModalOpen: boolean;
+  
+  // Notifications state
+  notifications: Array<{
+    id: string;
+    type: NotificationType;
+    title: string;
+    message: string;
+  }>;
+  
   // Actions
   setCurrentUser: (user: User | null) => void;
   toggleProfileType: () => void;
@@ -36,6 +48,16 @@ interface AppState {
   setPriceRange: (range: [number, number]) => void;
   filterProducts: () => void;
   setLoading: (loading: boolean) => void;
+  openAuthModal: () => void;
+  closeAuthModal: () => void;
+  
+  // Notification actions
+  showNotification: (type: NotificationType, title: string, message: string) => void;
+  removeNotification: (id: string) => void;
+  showSuccess: (title: string, message: string) => void;
+  showError: (title: string, message: string) => void;
+  showWarning: (title: string, message: string) => void;
+  showInfo: (title: string, message: string) => void;
 }
 
 export const useStore = create<AppState>((set, get) => ({
@@ -51,6 +73,8 @@ export const useStore = create<AppState>((set, get) => ({
   searchQuery: '',
   selectedCategory: '',
   priceRange: [0, 5000],
+  isAuthModalOpen: false,
+  notifications: [],
 
   // Actions
   setCurrentUser: (user) => set({ currentUser: user }),
@@ -78,9 +102,11 @@ export const useStore = create<AppState>((set, get) => ({
   },
   
   removeFromFavorites: (productId) => {
-    const { favorites } = get();
+    const { favorites, currentUser } = get();
+    if (!currentUser) return;
+    
     set({ 
-      favorites: favorites.filter(fav => fav.productId !== productId) 
+      favorites: favorites.filter(fav => !(fav.productId === productId && fav.userId === currentUser.id))
     });
   },
   
@@ -101,11 +127,12 @@ export const useStore = create<AppState>((set, get) => ({
     let filtered = products;
     
     // Filter by search query
-    if (searchQuery) {
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
       filtered = filtered.filter(product =>
-        product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
+        product.title.toLowerCase().includes(query) ||
+        product.description.toLowerCase().includes(query) ||
+        product.tags.some(tag => tag.toLowerCase().includes(query))
       );
     }
     
@@ -122,5 +149,42 @@ export const useStore = create<AppState>((set, get) => ({
     set({ filteredProducts: filtered });
   },
   
-  setLoading: (loading) => set({ isLoading: loading })
+  setLoading: (loading) => set({ isLoading: loading }),
+  
+  openAuthModal: () => set({ isAuthModalOpen: true }),
+  
+  closeAuthModal: () => set({ isAuthModalOpen: false }),
+  
+  // Notification actions
+  showNotification: (type, title, message) => {
+    const id = Date.now().toString();
+    // Add a small delay to prevent overlap with modals
+    setTimeout(() => {
+      set((state) => ({
+        notifications: [...state.notifications, { id, type, title, message }]
+      }));
+    }, 100);
+  },
+  
+  removeNotification: (id) => {
+    set((state) => ({
+      notifications: state.notifications.filter(notification => notification.id !== id)
+    }));
+  },
+  
+  showSuccess: (title, message) => {
+    get().showNotification('success', title, message);
+  },
+  
+  showError: (title, message) => {
+    get().showNotification('error', title, message);
+  },
+  
+  showWarning: (title, message) => {
+    get().showNotification('warning', title, message);
+  },
+  
+  showInfo: (title, message) => {
+    get().showNotification('info', title, message);
+  }
 })); 

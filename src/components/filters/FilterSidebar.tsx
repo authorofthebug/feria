@@ -96,14 +96,10 @@ export default function FilterSidebar() {
       </AnimatePresence>
 
       {/* Desktop Sidebar */}
-      <motion.div
-        initial={{ opacity: 0, x: -20 }}
-        animate={{ opacity: 1, x: 0 }}
-        className="hidden lg:block w-80 bg-white rounded-lg shadow-lg p-6 h-fit sticky top-24"
-      >
+      <div className="hidden lg:block w-full bg-white rounded-lg shadow-lg p-6 min-h-[500px]">
         <h2 className="text-xl font-semibold mb-6">Filtros</h2>
         <FilterContent />
-      </motion.div>
+      </div>
     </>
   );
 
@@ -124,33 +120,39 @@ export default function FilterSidebar() {
             )}
           </button>
           
-          <AnimatePresence>
-            {expandedSections.category && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                className="space-y-2"
-              >
-                {mockCategories.map((category) => (
-                  <motion.button
-                    key={category.id}
-                    onClick={() => handleCategorySelect(category.name)}
-                    className={`flex items-center space-x-3 w-full p-2 rounded-lg transition-colors ${
-                      selectedCategory === category.name
-                        ? 'bg-blue-50 text-blue-700'
-                        : 'hover:bg-gray-50'
-                    }`}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <span className="text-2xl">{category.icon}</span>
-                    <span className="text-sm">{category.name}</span>
-                  </motion.button>
-                ))}
-              </motion.div>
-            )}
-          </AnimatePresence>
+          <motion.div
+            initial={false}
+            animate={{ 
+              height: expandedSections.category ? 'auto' : 0,
+              opacity: expandedSections.category ? 1 : 0
+            }}
+            transition={{ 
+              duration: 0.3, 
+              ease: "easeInOut",
+              height: { duration: 0.3, ease: "easeInOut" },
+              opacity: { duration: 0.2, ease: "easeInOut" }
+            }}
+            className="overflow-hidden"
+          >
+            <div className="space-y-2 pb-2">
+              {mockCategories.map((category) => (
+                <motion.button
+                  key={category.id}
+                  onClick={() => handleCategorySelect(category.name)}
+                  className={`flex items-center space-x-3 w-full p-2 rounded-lg transition-colors ${
+                    selectedCategory === category.name
+                      ? 'bg-blue-50 text-blue-700'
+                      : 'hover:bg-gray-50'
+                  }`}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <span className="text-2xl">{category.icon}</span>
+                  <span className="text-sm">{category.name}</span>
+                </motion.button>
+              ))}
+            </div>
+          </motion.div>
         </div>
 
         {/* Price Range */}
@@ -167,46 +169,52 @@ export default function FilterSidebar() {
             )}
           </button>
           
-          <AnimatePresence>
-            {expandedSections.price && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                className="space-y-4"
-              >
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm text-gray-600">
-                    <span>€{priceRange[0]}</span>
-                    <span>€{priceRange[1]}</span>
-                  </div>
-                  <input
-                    type="range"
-                    min="0"
-                    max="5000"
-                    step="50"
-                    value={priceRange[1]}
-                    onChange={(e) => handlePriceChange(priceRange[0], parseInt(e.target.value))}
-                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
-                  />
+          <motion.div
+            initial={false}
+            animate={{ 
+              height: expandedSections.price ? 'auto' : 0,
+              opacity: expandedSections.price ? 1 : 0
+            }}
+            transition={{ 
+              duration: 0.3, 
+              ease: "easeInOut",
+              height: { duration: 0.3, ease: "easeInOut" },
+              opacity: { duration: 0.2, ease: "easeInOut" }
+            }}
+            className="overflow-hidden"
+          >
+            <div className="space-y-4 pb-2">
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm text-gray-600">
+                  <span>€{priceRange[0]}</span>
+                  <span>€{priceRange[1]}</span>
                 </div>
-                
-                <div className="grid grid-cols-2 gap-2">
-                  {[100, 250, 500, 1000].map((price) => (
-                    <motion.button
-                      key={price}
-                      onClick={() => handlePriceChange(0, price)}
-                      className="px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      Hasta €{price}
-                    </motion.button>
-                  ))}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+                <input
+                  type="range"
+                  min="0"
+                  max="5000"
+                  step="50"
+                  value={priceRange[1]}
+                  onChange={(e) => handlePriceChange(priceRange[0], parseInt(e.target.value))}
+                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+                />
+              </div>
+              
+              <div className="grid grid-cols-2 gap-2">
+                {[100, 250, 500, 1000].map((price) => (
+                  <motion.button
+                    key={price}
+                    onClick={() => handlePriceChange(0, price)}
+                    className="px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    Hasta €{price}
+                  </motion.button>
+                ))}
+              </div>
+            </div>
+          </motion.div>
         </div>
 
         {/* Condition */}
@@ -223,34 +231,40 @@ export default function FilterSidebar() {
             )}
           </button>
           
-          <AnimatePresence>
-            {expandedSections.condition && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                className="space-y-2"
-              >
-                {[
-                  { value: 'new', label: 'Nuevo', color: 'bg-green-100 text-green-800' },
-                  { value: 'like-new', label: 'Como nuevo', color: 'bg-blue-100 text-blue-800' },
-                  { value: 'good', label: 'Bueno', color: 'bg-yellow-100 text-yellow-800' },
-                  { value: 'fair', label: 'Aceptable', color: 'bg-orange-100 text-orange-800' },
-                  { value: 'poor', label: 'Usado', color: 'bg-red-100 text-red-800' }
-                ].map((condition) => (
-                  <motion.button
-                    key={condition.value}
-                    className="flex items-center space-x-3 w-full p-2 rounded-lg hover:bg-gray-50 transition-colors"
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <div className={`w-3 h-3 rounded-full ${condition.color.split(' ')[0]}`} />
-                    <span className="text-sm">{condition.label}</span>
-                  </motion.button>
-                ))}
-              </motion.div>
-            )}
-          </AnimatePresence>
+          <motion.div
+            initial={false}
+            animate={{ 
+              height: expandedSections.condition ? 'auto' : 0,
+              opacity: expandedSections.condition ? 1 : 0
+            }}
+            transition={{ 
+              duration: 0.3, 
+              ease: "easeInOut",
+              height: { duration: 0.3, ease: "easeInOut" },
+              opacity: { duration: 0.2, ease: "easeInOut" }
+            }}
+            className="overflow-hidden"
+          >
+            <div className="space-y-2 pb-2">
+              {[
+                { value: 'new', label: 'Nuevo', color: 'bg-green-100 text-green-800' },
+                { value: 'like-new', label: 'Como nuevo', color: 'bg-blue-100 text-blue-800' },
+                { value: 'good', label: 'Bueno', color: 'bg-yellow-100 text-yellow-800' },
+                { value: 'fair', label: 'Aceptable', color: 'bg-orange-100 text-orange-800' },
+                { value: 'poor', label: 'Usado', color: 'bg-red-100 text-red-800' }
+              ].map((condition) => (
+                <motion.button
+                  key={condition.value}
+                  className="flex items-center space-x-3 w-full p-2 rounded-lg hover:bg-gray-50 transition-colors"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <div className={`w-3 h-3 rounded-full ${condition.color.split(' ')[0]}`} />
+                  <span className="text-sm">{condition.label}</span>
+                </motion.button>
+              ))}
+            </div>
+          </motion.div>
         </div>
 
         {/* Clear Filters */}
